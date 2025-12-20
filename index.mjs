@@ -14,14 +14,18 @@ export const prepareDatabase = async ({options, filesDirectory}) => {
     await ensureDir(publicDir) ;
 
     //create default route file if not exist
-    let routeFile = path.join(publicDir, "routes.json") ;
+    let routeFile = path.join(publicDir, "viewz.config.json") ;
     if(!await pathExists(routeFile)){
         await writeFile(routeFile, `{
-    "options": { "mode": "BROWSER" },
-    "routes": [
-        { "route": "/", "path": "views/root" }
-    ]
-}`, {encoding: "utf8"}) ;
+            "routing": "BROWSER",
+            "viewsPath": "views",
+            "routes": [
+                {
+                    "url": "/",
+                    "path": "root"
+                }
+            ]
+        }`, {encoding: "utf8"}) ;
     } 
     
     //create default root view if not exist
@@ -41,32 +45,6 @@ export const prepareDatabase = async ({options, filesDirectory}) => {
     if(!await pathExists(rootJsFile)){
         await writeFile(rootJsFile, `//Script goes here`, {encoding: "utf8"}) ;
     }
-
-    //add base tag to index.html if not present
-    let indexHtmlFile = path.join(publicDir, "index.html") ;
-
-    let indexHtml = await readFile(indexHtmlFile, {encoding: "utf8"}) ;
-    if(!indexHtml.includes("<base")){
-        let baseCode = `<base href="/app/${options.database}/">`
-        let indexEndHead  = indexHtml.toLowerCase().indexOf("</head") ;
-        let indexInsertBase = indexEndHead ; 
-        if(indexEndHead === -1){
-            let indexBody = indexHtml.toLowerCase().indexOf("<body") ;
-            baseCode = `<head>${baseCode}</head>` ;
-            indexInsertBase = indexBody ;
-            if(indexBody === -1){
-                let indexTagHtml = indexHtml.toLowerCase().indexOf("<html") ;
-                if(indexTagHtml !== -1){
-                    indexInsertBase = indexHtml.indexOf(">", indexTagHtml)+1 ;
-                }else{
-                    indexInsertBase = 0;
-                }
-            }
-        }
-        indexHtml = indexHtml.substring(0, indexInsertBase)+baseCode+indexHtml.substring(indexInsertBase) ;
-        await writeFile(indexHtmlFile, indexHtml, {encoding: "utf8"}) ;
-    }
-
 }
 
 /**
@@ -80,13 +58,13 @@ export const cleanDatabase = async () => {
 /**
  * Init plugin when Open BamZ platform start
  */
-export const initPlugin = async ({app, runQuery, logger, loadPluginData, contextOfApp, hasCurrentPlugin, injectBamz}) => {
+export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, hasCurrentPlugin, injectBamz}) => {
     const router = express.Router();
 
     const handlersByAppName = {}
 
     //must recompute SSR handler when these file changed
-    const filesContainer = ["index.html", "routes.json"] ;
+    const filesContainer = ["index.html", "viewz.config.json"] ;
     
     async function getHandlers (appName){
         if(!handlersByAppName[appName]){
@@ -111,7 +89,7 @@ export const initPlugin = async ({app, runQuery, logger, loadPluginData, context
         const sourcePath = path.join(process.env.DATA_DIR, "apps" ,appName, "public");
 
         let contextApp = await contextOfApp(appName) ;
-        let requestHandler = await generateSsrContent({ sourcePath, htmlProcessors: contextApp.pluginsData.viewz.pluginSlots.htmlProcessors });
+        let requestHandler = await generateSsrContent({ sourcePath, htmlProcessors: contextApp.pluginsData["open-bamz-viewz"].pluginSlots.htmlProcessors });
         let fileStats = {} ;
         for(let f of filesContainer){
             fileStats[f] = await stat(path.join(sourcePath, f)) ;
@@ -121,28 +99,23 @@ export const initPlugin = async ({app, runQuery, logger, loadPluginData, context
 
     
 
-    app.use("/app/:appName", (req, res, next)=>{
-        (async ()=>{
-            try{
-                let appName = req.params.appName;
+    app.use(async (req, res, next)=>{
+        try{
+            let appName = req.appName;
 
-                let hasPlugin = (await runQuery({database: appName}, "SELECT plugin_id FROM openbamz.plugins WHERE plugin_id='viewz'")).rows.length>0;
-                if(hasPlugin){
-                    let handler = await getHandlers(appName) ;
-                    let html = await handler.requestHandler(req) ;
-                    if(!html){ return next() ; }
-                    //inject openbamz admin banner
-                    html = injectBamz(html, appName) ;
-                    //html = html.replace('<body>', `<body style="opacity:0"><script>window.BAMZ_APP = '${appName}' ;</script><script type="module" src="/_openbamz_admin.js?appName=${appName}"></script>`);
-                    res.end(html) ;
-                }else{
-                    next();
-                }
-            }catch(err){
-                logger.error("Error while handling app SSR request %o", err);
-                res.status(err.statusCode??500).json(err);
-            }
-        })();
+            if(!await hasCurrentPlugin(appName)){ return next() ; }
+
+            let handler = await getHandlers(appName) ;
+            let html = await handler.requestHandler(req) ;
+            if(!html){ return next() ; }
+            //inject openbamz admin banner
+            html = injectBamz(html, appName) ;
+            //html = html.replace('<body>', `<body style="opacity:0"><script>window.BAMZ_APP = '${appName}' ;</script><script type="module" src="/_openbamz_admin.js?appName=${appName}"></script>`);
+            res.end(html) ;
+        }catch(err){
+            logger.error("Error while handling app SSR request %o", err);
+            res.status(err.statusCode??500).json(err);
+        }
     });
 
     router.get('/viewz-extensions/:appName', (req, res, next) => {
@@ -152,7 +125,7 @@ export const initPlugin = async ({app, runQuery, logger, loadPluginData, context
             if(await hasCurrentPlugin(appName)){
             
                 let appContext = await contextOfApp(appName) ;
-                let allowedExtensions = appContext.pluginsData["viewz"]?.pluginSlots?.viewzExtensions??[] ;
+                let allowedExtensions = appContext.pluginsData["open-bamz-viewz"]?.pluginSlots?.viewzExtensions??[] ;
                 let js = `let extensions = [];`;
                 for(let i=0; i<allowedExtensions.length; i++){
                     let ext = allowedExtensions[i];
@@ -174,7 +147,7 @@ export const initPlugin = async ({app, runQuery, logger, loadPluginData, context
         let appName = req.params.appName ;
         
         let appContext = await contextOfApp(appName) ;
-        let allowedExtensions = appContext.pluginsData["viewz"]?.pluginSlots?.viewzExtensions??[] ;
+        let allowedExtensions = appContext.pluginsData["open-bamz-viewz"]?.pluginSlots?.viewzExtensions??[] ;
         for(let ext of allowedExtensions){
             if(ext["d.ts"]){
                 res.write(ext["d.ts"]) ;
@@ -190,7 +163,7 @@ export const initPlugin = async ({app, runQuery, logger, loadPluginData, context
             if(await hasCurrentPlugin(appName)){
             
                 let appContext = await contextOfApp(appName) ;
-                let allowedFormatters = appContext.pluginsData["viewz"]?.pluginSlots?.bindzFormatters??[] ;
+                let allowedFormatters = appContext.pluginsData["open-bamz-viewz"]?.pluginSlots?.bindzFormatters??[] ;
                 let js = `let formatters = [];`;
                 for(let i=0; i<allowedFormatters.length; i++){
                     let ext = allowedFormatters[i];
@@ -249,10 +222,10 @@ export const initPlugin = async ({app, runQuery, logger, loadPluginData, context
         }
 
 
-        if(pluginsData?.["viewz"]?.pluginSlots?.viewzExtensions){
-            pluginsData?.["viewz"]?.pluginSlots?.viewzExtensions.push( {
+        if(pluginsData?.["open-bamz-viewz"]?.pluginSlots?.viewzExtensions){
+            pluginsData?.["open-bamz-viewz"]?.pluginSlots?.viewzExtensions.push( {
                 plugin: "viewz",
-                extensionPath: "/plugin/:appName/viewz/lib/viewz-bamz.mjs",
+                extensionPath: "/plugin/open-bamz-viewz/lib/viewz-bamz.mjs",
                 "d.ts": `
                 declare const bamz: BamzClient;
                 `
