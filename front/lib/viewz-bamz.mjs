@@ -1,4 +1,4 @@
-import BamzClient from "/bamz-lib/bamz-client.mjs";
+const BamzClient = (await import(`/bamz-lib/bamz-client.mjs`)).default ;
 
 export default {
     globals: {
