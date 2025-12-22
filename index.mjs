@@ -206,10 +206,10 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
                 extensionPath: "/plugin/:appName/viewz/editor/route-editor-extension.mjs"
             })
         }
-        if(pluginsData?.["ag-grid"]?.pluginSlots?.agGridExtensions){
-            pluginsData?.["ag-grid"]?.pluginSlots?.agGridExtensions.push( {
-                plugin: "dbadmin",
-                extensionPath: "/plugin/:appName/viewz/lib/ag-grid-viewz.mjs"
+        if(pluginsData?.["open-bamz-ag-grid"]?.pluginSlots?.agGridExtensions){
+            pluginsData?.["open-bamz-ag-grid"]?.pluginSlots?.agGridExtensions.push( {
+                plugin: "open-bamz-viewz",
+                extensionPath: "/plugin/viewz/lib/ag-grid-viewz.mjs"
             })
         }
 
