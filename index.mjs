@@ -106,6 +106,7 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
             if(!await hasCurrentPlugin(appName)){ return next() ; }
 
             let handler = await getHandlers(appName) ;
+            //debugger;
             let html = await handler.requestHandler(req) ;
             if(!html){ return next() ; }
             //inject openbamz admin banner
@@ -118,10 +119,10 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         }
     });
 
-    router.get('/viewz-extensions/:appName', (req, res, next) => {
+    router.get('/viewz-extensions', (req, res, next) => {
         (async ()=>{
 
-            let appName = req.params.appName ;
+            let appName = req.appName ;
             if(await hasCurrentPlugin(appName)){
             
                 let appContext = await contextOfApp(appName) ;
@@ -143,8 +144,8 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         })();
     });
 
-    router.get("/definitions/:appName/ext-lib.d.ts", async (req, res)=>{
-        let appName = req.params.appName ;
+    router.get("/definitions/ext-lib.d.ts", async (req, res)=>{
+        let appName = req.appName ;
         
         let appContext = await contextOfApp(appName) ;
         let allowedExtensions = appContext.pluginsData["open-bamz-viewz"]?.pluginSlots?.viewzExtensions??[] ;
@@ -156,10 +157,10 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         res.end();
     });
 
-    router.get('/bindz-formatters/:appName', (req, res, next) => {
+    router.get('/bindz-formatters', (req, res, next) => {
         (async ()=>{
 
-            let appName = req.params.appName ;
+            let appName = req.appName ;
             if(await hasCurrentPlugin(appName)){
             
                 let appContext = await contextOfApp(appName) ;
@@ -186,24 +187,24 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         if(pluginsData?.["grapesjs-editor"]?.pluginSlots?.grapesJsEditor){
             pluginsData?.["grapesjs-editor"]?.pluginSlots?.grapesJsEditor.push( {
                 plugin: "viewz",
-                extensionPath: "/plugin/:appName/viewz/editor/grapesjs-viewz-extension.mjs"
+                extensionPath: "/plugin/viewz/editor/grapesjs-viewz-extension.mjs"
             })
         }
 
         if(pluginsData?.["code-editor"]?.pluginSlots?.javascriptApiDef){
             pluginsData?.["code-editor"]?.pluginSlots?.javascriptApiDef.push( {
                 plugin: "viewz",
-                url: "/plugin/:appName/viewz/lib/viewz.d.ts"
+                url: "/plugin/viewz/lib/viewz.d.ts"
             })
             pluginsData?.["code-editor"]?.pluginSlots?.javascriptApiDef.push( {
                 plugin: "viewz",
-                url: "/viewz/definitions/:appName/ext-lib.d.ts"
+                url: "/viewz/definitions/ext-lib.d.ts"
             })           
         }
         if(pluginsData?.["code-editor"]?.pluginSlots?.codeEditors){
             pluginsData?.["code-editor"]?.pluginSlots?.codeEditors.push( {
                 plugin: "viewz",
-                extensionPath: "/plugin/:appName/viewz/editor/route-editor-extension.mjs"
+                extensionPath: "/plugin/viewz/editor/route-editor-extension.mjs"
             })
         }
         if(pluginsData?.["open-bamz-ag-grid"]?.pluginSlots?.agGridExtensions){
@@ -231,6 +232,18 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
                 `
             })
         }
+
+        if(pluginsData?.["open-bamz-packaging"]?.pluginSlots?.urlsToDownload){
+            //always store dev that is the default lang
+            pluginsData?.["open-bamz-packaging"]?.pluginSlots?.urlsToDownload.push({
+                url: `/open-bamz-viewz/bindz-formatters`,
+                dest: `open-bamz-viewz/bindz-formatters.mjs`
+            });
+            pluginsData?.["open-bamz-packaging"]?.pluginSlots?.urlsToDownload.push({
+                url: `/open-bamz-viewz/viewz-extensions`,
+                dest: `open-bamz-viewz/viewz-extensions.mjs`
+            });
+        }
     })
     
 
@@ -243,7 +256,7 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         menu: [
             {
                 name: "admin", entries: [
-                    { name: "View Z", link: "/plugin/:appName/viewz/" }
+                    { name: "View Z", link: "/plugin/viewz/" }
                 ]
             }
         ],
