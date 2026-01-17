@@ -74,11 +74,16 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
 
         const sourcePath = path.join(process.env.DATA_DIR, "apps" ,appName, "public");
         for(let f of filesContainer){
-            let s = await stat(path.join(sourcePath, f)) ;
-            if(handler.fileStats[f].mtime < s.mtime){
-                // file have changed, reprepare the handler
-                await prepareHandlers (appName) ;
-                break;
+            try{
+                let s = await stat(path.join(sourcePath, f)) ;
+                if(handler.fileStats[f].mtime < s.mtime){
+                    // file have changed, reprepare the handler
+                    await prepareHandlers (appName) ;
+                    break;
+                }
+            }catch(err){
+                //ignore error
+                continue;
             }
         }
 
@@ -114,8 +119,9 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
             //html = html.replace('<body>', `<body style="opacity:0"><script>window.BAMZ_APP = '${appName}' ;</script><script type="module" src="/_openbamz_admin.js?appName=${appName}"></script>`);
             res.end(html) ;
         }catch(err){
-            logger.error("Error while handling app SSR request %o", err);
-            res.status(err.statusCode??500).json(err);
+            //logger.error("Error while handling app SSR request %o", err);
+            //res.status(err.statusCode??500).json(err);
+            next() ;
         }
     });
 
@@ -157,29 +163,26 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         res.end();
     });
 
-    router.get('/bindz-formatters', (req, res, next) => {
-        (async ()=>{
-
-            let appName = req.appName ;
-            if(await hasCurrentPlugin(appName)){
-            
-                let appContext = await contextOfApp(appName) ;
-                let allowedFormatters = appContext.pluginsData["open-bamz-viewz"]?.pluginSlots?.bindzFormatters??[] ;
-                let js = `let formatters = [];`;
-                for(let i=0; i<allowedFormatters.length; i++){
-                    let ext = allowedFormatters[i];
-                    js += `
-                    import ext${i} from "${ext.formatterPath.replace(":appName", appName)}" ;
-                    formatters.push({ plugin: "${ext.plugin}", ...ext${i}}) ;
-                    `
-                }
-                js += `export default formatters`;
-                res.setHeader("Content-Type", "application/javascript");
-                res.end(js);
-            }else{
-                next() ;
+    router.get('/bindz-formatters', async (req, res, next) => {
+        let appName = req.appName ;
+        if(await hasCurrentPlugin(appName)){
+        
+            let appContext = await contextOfApp(appName) ;
+            let allowedFormatters = appContext.pluginsData["open-bamz-viewz"]?.pluginSlots?.bindzFormatters??[] ;
+            let js = `let formatters = [];`;
+            for(let i=0; i<allowedFormatters.length; i++){
+                let ext = allowedFormatters[i];
+                js += `
+                import ext${i} from "${ext.formatterPath.replace(":appName", appName)}" ;
+                formatters.push({ plugin: "${ext.plugin}", ...ext${i}}) ;
+                `
             }
-        })();
+            js += `export default formatters`;
+            res.setHeader("Content-Type", "application/javascript");
+            res.end(js);
+        }else{
+            next() ;
+        }
     });
     
 
@@ -242,6 +245,16 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
             pluginsData?.["open-bamz-packaging"]?.pluginSlots?.urlsToDownload.push({
                 url: `/open-bamz-viewz/viewz-extensions`,
                 dest: `open-bamz-viewz/viewz-extensions.mjs`
+            });
+        }
+
+        if(pluginsData?.["open-bamz-pwa"]?.pluginSlots?.urlsToCache){
+            //always store dev that is the default lang
+            pluginsData?.["open-bamz-pwa"]?.pluginSlots?.urlsToCache.push({
+                url: `/open-bamz-viewz/bindz-formatters`,
+            });
+            pluginsData?.["open-bamz-pwa"]?.pluginSlots?.urlsToCache.push({
+                url: `/open-bamz-viewz/viewz-extensions`,
             });
         }
     })
