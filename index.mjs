@@ -190,14 +190,14 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         if(pluginsData?.["grapesjs-editor"]?.pluginSlots?.grapesJsEditor){
             pluginsData?.["grapesjs-editor"]?.pluginSlots?.grapesJsEditor.push( {
                 plugin: "viewz",
-                extensionPath: "/plugin/viewz/editor/grapesjs-viewz-extension.mjs"
+                extensionPath: "/plugin/open-bamz-viewz/editor/grapesjs-viewz-extension.mjs"
             })
         }
 
         if(pluginsData?.["code-editor"]?.pluginSlots?.javascriptApiDef){
             pluginsData?.["code-editor"]?.pluginSlots?.javascriptApiDef.push( {
                 plugin: "viewz",
-                url: "/plugin/viewz/lib/viewz.d.ts"
+                url: "/plugin/open-bamz-viewz/lib/viewz.d.ts"
             })
             pluginsData?.["code-editor"]?.pluginSlots?.javascriptApiDef.push( {
                 plugin: "viewz",
@@ -207,13 +207,13 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
         if(pluginsData?.["code-editor"]?.pluginSlots?.codeEditors){
             pluginsData?.["code-editor"]?.pluginSlots?.codeEditors.push( {
                 plugin: "viewz",
-                extensionPath: "/plugin/viewz/editor/route-editor-extension.mjs"
+                extensionPath: "/plugin/open-bamz-viewz/editor/route-editor-extension.mjs"
             })
         }
         if(pluginsData?.["open-bamz-ag-grid"]?.pluginSlots?.agGridExtensions){
             pluginsData?.["open-bamz-ag-grid"]?.pluginSlots?.agGridExtensions.push( {
                 plugin: "open-bamz-viewz",
-                extensionPath: "/plugin/viewz/lib/ag-grid-viewz.mjs"
+                extensionPath: "/plugin/open-bamz-viewz/lib/ag-grid-viewz.mjs"
             })
         }
 
