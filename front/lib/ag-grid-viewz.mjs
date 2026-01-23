@@ -1,4 +1,4 @@
-import { bind } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@3e1fb6d3f135eee108d11f2ede4dbd7bbcc16831/lib/bindz.mjs" ;
+import { bind } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@574bca480486664cf59f30437f1c3c71f204f7bc/lib/bindz.mjs" ;
 
 
 function renderCell(elCell, {html, data, eGridCell}){
@@ -14,6 +14,9 @@ function renderCell(elCell, {html, data, eGridCell}){
         elCell.contextz = {view: parentViewContainer.contextz.view} ;
     }
     bind(elCell, data, elCell.contextz);//, null, null, true);
+    if(elCell.contextz && elCell.contextz.view){
+        elCell.contextz.view.dispatchEvent("viewz-cell-rendered", { element: elCell, data: data }) ;
+    }
 }
 
 
