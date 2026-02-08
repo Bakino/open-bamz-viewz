@@ -1,4 +1,4 @@
-import { bind } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@2f6b406a6e64fac23471d16d355bc64887cafd56/lib/bindz.mjs" ;
+import { bind } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@a9006486f9822b83f4e6655d42ca560eda52cccf/lib/bindz.mjs" ;
 
 
 function renderCell(elCell, {html, data, eGridCell}){
