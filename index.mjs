@@ -115,7 +115,7 @@ export const initPlugin = async ({app, logger, loadPluginData, contextOfApp, has
             let html = await handler.requestHandler(req) ;
             if(!html){ return next() ; }
             //inject openbamz admin banner
-            html = injectBamz(html, appName) ;
+            html = await injectBamz(html, appName, false, req) ;
             //html = html.replace('<body>', `<body style="opacity:0"><script>window.BAMZ_APP = '${appName}' ;</script><script type="module" src="/_openbamz_admin.js?appName=${appName}"></script>`);
             res.end(html) ;
         }catch(err){
