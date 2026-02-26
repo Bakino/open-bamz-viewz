@@ -10,6 +10,6 @@
   "dependencies": {
     "express": "^5.1.0",
     "fs-extra": "^11.3.2",
-    "viewz": "git+https://github.com/Bakino/viewz#c23e6de681e9490a0cacb5ba1e68b6d928d1290d"
+    "viewz": "git+https://github.com/Bakino/viewz#84067388cf2bda2137268f3fd75feb34b11cd5b0"
   }
 }
