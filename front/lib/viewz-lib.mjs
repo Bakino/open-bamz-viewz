@@ -4,9 +4,9 @@ window.VIEWZ_HTML_PROCESSORS = [];
 
 export let viewzLib = lib;
 
-import { ViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@84067388cf2bda2137268f3fd75feb34b11cd5b0/lib/viewz.mjs" ;
-import { registerFormatter } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@84067388cf2bda2137268f3fd75feb34b11cd5b0/lib/bindz.mjs" ;
-import { startViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@84067388cf2bda2137268f3fd75feb34b11cd5b0/lib/frameworkz.mjs" ;
+import { ViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@ecc1deec416b4cbe704b1473ce7e4fc2c11c2df8/lib/viewz.mjs" ;
+import { registerFormatter } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@ecc1deec416b4cbe704b1473ce7e4fc2c11c2df8/lib/bindz.mjs" ;
+import { startViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@ecc1deec416b4cbe704b1473ce7e4fc2c11c2df8/lib/frameworkz.mjs" ;
 
 export { startViewZ } ;
 
