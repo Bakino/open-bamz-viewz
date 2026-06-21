@@ -1,0 +1,90 @@
+name: viewz-developer
+description: Build server-side rendered applications with ViewZ framework in Open BamZ
+version: "1.0.0"
+category: framework
+tags:
+  - viewz
+  - ssr
+  - open-bamz
+  - binding
+  - templating
+  - ag-grid
+
+# Skill availability
+applicable_to:
+  - open-bamz-applications
+  - applications-using-open-bamz-viewz-plugin
+
+# Trigger patterns - when Claude should suggest this skill
+triggers:
+  keywords:
+    - "create.*viewz"
+    - "build.*view"
+    - "render.*template"
+    - "ag-grid.*viewz"
+    - "viewz.*extension"
+    - "bindz.*formatter"
+  patterns:
+    - "working with ViewZ"
+    - "SSR content"
+    - "bamz.*api"
+    - "cell renderer"
+
+# Key capabilities
+capabilities:
+  - Setting up ViewZ views and routing
+  - Creating templates with bindz binding syntax
+  - Integrating AG-Grid with ViewZ
+  - Building custom extensions and formatters
+  - Using the bamz client API
+  - HTML processing and transformation
+  - TypeScript support for code completion
+
+# Common use cases
+use_cases:
+  - Create a new view template
+  - Add AG-Grid cell rendering with ViewZ
+  - Register custom ViewZ extensions
+  - Build data binding formatters
+  - Setup view routing
+  - Use bamz client for navigation/API
+  - Create interactive forms
+  - Implement master-detail patterns
+
+# Integration points
+integrations:
+  - grapesjs-editor
+  - code-editor
+  - open-bamz-ag-grid
+  - open-bamz-packaging
+  - open-bamz-pwa
+
+# Concepts covered
+concepts:
+  - ViewZ SSR Framework
+  - Bindz data binding
+  - Plugin slots and extensions
+  - AG-Grid cell rendering
+  - bamz client API
+  - View lifecycle
+  - Reactive data
+  - Template syntax
+
+# File patterns
+file_patterns:
+  - "**/*.html"           # View templates
+  - "**/views/**/*.js"    # View logic
+  - "**/*-extension.mjs"  # Extensions
+  - "**/*-formatter.mjs"  # Formatters
+  - "viewz.config.json"   # Configuration
+
+# Dependencies
+requires:
+  - open-bamz-viewz-plugin
+  - open-bamz (platform)
+
+# Related skills
+related_skills:
+  - ag-grid-developer
+  - grapesjs-designer
+  - code-editor-expert

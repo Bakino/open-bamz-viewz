@@ -4,9 +4,9 @@ window.VIEWZ_HTML_PROCESSORS = [];
 
 export let viewzLib = lib;
 
-import { ViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@3a704a6fc2e856cb4098cb43bdc1a9ef37c8b782/lib/viewz.mjs" ;
-import { registerFormatter } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@3a704a6fc2e856cb4098cb43bdc1a9ef37c8b782/lib/bindz.mjs" ;
-import { startViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@3a704a6fc2e856cb4098cb43bdc1a9ef37c8b782/lib/frameworkz.mjs" ;
+import { ViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@68ad819d80a519d7fe92bde69d30070c99f85c6d/lib/viewz.mjs" ;
+import { registerFormatter } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@68ad819d80a519d7fe92bde69d30070c99f85c6d/lib/bindz.mjs" ;
+import { startViewZ } from "https://cdn.jsdelivr.net/gh/Bakino/viewz@68ad819d80a519d7fe92bde69d30070c99f85c6d/lib/frameworkz.mjs" ;
 
 export { startViewZ } ;
 
@@ -27,7 +27,8 @@ if(window.BAMZ_IN_PLUGIN){
             ViewZ.loadExtension(ext) ;
         }
         if(!window.BAMZ_NO_ROUTERZ){
-            startViewZ() ;
+            const router = await startViewZ() ;
+            viewzLib.router = router ;
         }
     })
 }
